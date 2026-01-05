@@ -10,34 +10,77 @@ class FamilyTree {
         this.offsetX = 0;
         this.offsetY = 0;
         this.selectedNode = null;
-        this.isDragging = false;
+        this.isPanning = false;
         this.draggedNode = null;
+        this.draggedElement = null;
         this.dragStart = { x: 0, y: 0 };
+        this.animationFrame = null;
 
         this.initializeEventListeners();
     }
 
     initializeEventListeners() {
-        // Mouse events for panning
+        // Mouse events for panning and node dragging
         this.container.addEventListener('mousedown', (e) => {
-            if (e.target === this.container || e.target.classList.contains('family-tree')) {
-                this.isDragging = true;
+            // Middle mouse button (button 1) or left click on background for panning
+            if (e.button === 1 ||
+                (e.button === 0 && (e.target === this.container || e.target.classList.contains('family-tree') || e.target.classList.contains('tree-canvas')))) {
+                e.preventDefault();
+                this.isPanning = true;
                 this.dragStart = { x: e.clientX - this.offsetX, y: e.clientY - this.offsetY };
                 this.container.style.cursor = 'grabbing';
             }
         });
 
+        // Prevent context menu on middle click
+        this.container.addEventListener('contextmenu', (e) => {
+            if (e.button === 1) {
+                e.preventDefault();
+            }
+        });
+
+        // Global mousemove handler for both panning and node dragging
         document.addEventListener('mousemove', (e) => {
-            if (this.isDragging) {
+            // Handle panning
+            if (this.isPanning) {
                 this.offsetX = e.clientX - this.dragStart.x;
                 this.offsetY = e.clientY - this.dragStart.y;
                 this.render();
             }
+
+            // Handle node dragging with optimized rendering
+            if (this.draggedNode && this.draggedElement) {
+                const newX = (e.clientX - this.dragStart.x) / this.scale;
+                const newY = (e.clientY - this.dragStart.y) / this.scale;
+
+                this.draggedNode.x = newX;
+                this.draggedNode.y = newY;
+
+                // Update position directly without full re-render for smooth dragging
+                if (this.animationFrame) {
+                    cancelAnimationFrame(this.animationFrame);
+                }
+
+                this.animationFrame = requestAnimationFrame(() => {
+                    this.updateNodePosition(this.draggedElement, newX, newY);
+                    this.updateConnectionLines();
+                });
+            }
         });
 
+        // Global mouseup handler
         document.addEventListener('mouseup', () => {
-            this.isDragging = false;
-            this.container.style.cursor = 'default';
+            if (this.isPanning) {
+                this.isPanning = false;
+                this.container.style.cursor = 'default';
+            }
+
+            if (this.draggedNode) {
+                this.draggedNode = null;
+                this.draggedElement = null;
+                // Final render to ensure everything is in sync
+                this.render();
+            }
         });
 
         // Wheel event for zooming
@@ -46,6 +89,32 @@ class FamilyTree {
             const delta = e.deltaY > 0 ? 0.9 : 1.1;
             this.scale = Math.max(0.3, Math.min(3, this.scale * delta));
             this.render();
+        });
+    }
+
+    updateNodePosition(element, x, y) {
+        if (element && element.style) {
+            element.style.left = x + 'px';
+            element.style.top = y + 'px';
+        }
+    }
+
+    updateConnectionLines() {
+        const canvas = this.container.querySelector('.tree-canvas');
+        if (!canvas) return;
+
+        // Remove old lines
+        canvas.querySelectorAll('.connection-line').forEach(line => line.remove());
+
+        // Redraw lines
+        this.relationships.forEach(rel => {
+            const fromSim = this.sims.get(rel.from);
+            const toSim = this.sims.get(rel.to);
+
+            if (fromSim && toSim) {
+                const line = this.createConnectionLine(fromSim, toSim, rel.type);
+                canvas.insertBefore(line, canvas.firstChild);
+            }
         });
     }
 
@@ -292,34 +361,49 @@ class FamilyTree {
         node.appendChild(name);
         node.appendChild(details);
 
-        // Make node draggable
+        // Make node draggable - only set up the mousedown
         node.addEventListener('mousedown', (e) => {
+            // Only handle left mouse button
+            if (e.button !== 0) return;
+
             e.stopPropagation();
+            e.preventDefault();
+
             this.draggedNode = sim;
+            this.draggedElement = node;
             this.dragStart = {
-                x: e.clientX - sim.x,
-                y: e.clientY - sim.y
+                x: e.clientX - sim.x * this.scale,
+                y: e.clientY - sim.y * this.scale
             };
+            node.style.cursor = 'grabbing';
         });
 
-        node.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.selectNode(sim.id);
+        // Handle click for selection (with drag detection)
+        let mouseDownTime = 0;
+        let mouseDownPos = { x: 0, y: 0 };
+
+        node.addEventListener('mousedown', (e) => {
+            mouseDownTime = Date.now();
+            mouseDownPos = { x: e.clientX, y: e.clientY };
         });
 
-        document.addEventListener('mousemove', (e) => {
-            if (this.draggedNode === sim) {
-                sim.x = e.clientX - this.dragStart.x;
-                sim.y = e.clientY - this.dragStart.y;
-                this.render();
+        node.addEventListener('mouseup', (e) => {
+            const timeDiff = Date.now() - mouseDownTime;
+            const distanceMoved = Math.sqrt(
+                Math.pow(e.clientX - mouseDownPos.x, 2) +
+                Math.pow(e.clientY - mouseDownPos.y, 2)
+            );
+
+            // If it was a quick click with minimal movement, treat as selection
+            if (timeDiff < 200 && distanceMoved < 5) {
+                this.selectNode(sim.id);
             }
+
+            node.style.cursor = 'move';
         });
 
-        document.addEventListener('mouseup', () => {
-            if (this.draggedNode === sim) {
-                this.draggedNode = null;
-            }
-        });
+        // Set initial cursor
+        node.style.cursor = 'move';
 
         return node;
     }

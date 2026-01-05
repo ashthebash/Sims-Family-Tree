@@ -320,18 +320,32 @@ body {
     min-width: 160px;
     box-shadow: var(--shadow);
     cursor: move;
-    transition: all 0.2s;
+    transition: box-shadow 0.2s, border-color 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .tree-node:hover {
     box-shadow: var(--shadow-lg);
     border-color: var(--primary-color);
-    transform: scale(1.05);
+}
+
+.tree-node:active {
+    cursor: grabbing !important;
 }
 
 .tree-node.selected {
     border-color: var(--primary-color);
     border-width: 3px;
+}
+
+.tree-canvas {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .tree-node-avatar {
