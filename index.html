@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sims Family Tree Editor</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-sitemap"></i> Sims Family Tree Editor</h1>
+                <p class="subtitle">Create and manage your Sims family stories</p>
+            </div>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-section">
+                <button id="addSimBtn" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Add Sim
+                </button>
+                <button id="addRelationshipBtn" class="btn btn-secondary">
+                    <i class="fas fa-link"></i> Add Relationship
+                </button>
+            </div>
+
+            <div class="toolbar-section">
+                <button id="zoomInBtn" class="btn btn-icon" title="Zoom In">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button id="zoomOutBtn" class="btn btn-icon" title="Zoom Out">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <button id="resetViewBtn" class="btn btn-icon" title="Reset View">
+                    <i class="fas fa-compress"></i>
+                </button>
+            </div>
+
+            <div class="toolbar-section">
+                <button id="importBtn" class="btn btn-success">
+                    <i class="fas fa-file-import"></i> Import JSON
+                </button>
+                <button id="exportBtn" class="btn btn-success">
+                    <i class="fas fa-file-export"></i> Export JSON
+                </button>
+                <input type="file" id="importFile" accept=".json" style="display: none;">
+            </div>
+
+            <div class="toolbar-section">
+                <button id="loadExampleBtn" class="btn btn-info">
+                    <i class="fas fa-download"></i> Load Example
+                </button>
+                <button id="clearBtn" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Clear All
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h3><i class="fas fa-users"></i> Sims List</h3>
+                    <input type="text" id="searchSims" class="search-input" placeholder="Search sims...">
+                </div>
+                <div id="simsList" class="sims-list">
+                    <p class="empty-state">No sims yet. Click "Add Sim" to get started!</p>
+                </div>
+            </aside>
+
+            <!-- Family Tree Canvas -->
+            <main class="tree-container">
+                <div id="familyTree" class="family-tree">
+                    <div class="welcome-message">
+                        <i class="fas fa-sitemap fa-3x"></i>
+                        <h2>Welcome to Sims Family Tree Editor</h2>
+                        <p>Start by adding your first Sim or load an example family tree</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add/Edit Sim Modal -->
+    <div id="simModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Sim</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <form id="simForm">
+                <input type="hidden" id="simId">
+
+                <div class="form-group">
+                    <label for="simName">Name *</label>
+                    <input type="text" id="simName" required placeholder="Enter sim's name">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="simGender">Gender</label>
+                        <select id="simGender">
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="simAge">Life Stage</label>
+                        <select id="simAge">
+                            <option value="baby">Baby</option>
+                            <option value="toddler">Toddler</option>
+                            <option value="child">Child</option>
+                            <option value="teen">Teen</option>
+                            <option value="young-adult">Young Adult</option>
+                            <option value="adult">Adult</option>
+                            <option value="elder">Elder</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="simTraits">Traits</label>
+                    <input type="text" id="simTraits" placeholder="e.g., Creative, Outgoing, Gloomy">
+                </div>
+
+                <div class="form-group">
+                    <label for="simAspiration">Aspiration</label>
+                    <input type="text" id="simAspiration" placeholder="e.g., Master Chef, Serial Romantic">
+                </div>
+
+                <div class="form-group">
+                    <label for="simOccupation">Occupation</label>
+                    <input type="text" id="simOccupation" placeholder="e.g., Doctor, Astronaut">
+                </div>
+
+                <div class="form-group">
+                    <label for="simAvatar">Avatar URL (optional)</label>
+                    <input type="text" id="simAvatar" placeholder="https://example.com/avatar.jpg">
+                    <small>Or leave blank for default avatar</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="simNotes">Notes</label>
+                    <textarea id="simNotes" rows="3" placeholder="Additional notes about this sim..."></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Sim</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Relationship Modal -->
+    <div id="relationshipModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Relationship</h2>
+                <button class="close-btn" id="closeRelationshipModal">&times;</button>
+            </div>
+            <form id="relationshipForm">
+                <div class="form-group">
+                    <label for="relationType">Relationship Type</label>
+                    <select id="relationType">
+                        <option value="parent">Parent-Child</option>
+                        <option value="spouse">Spouse/Partner</option>
+                        <option value="sibling">Sibling</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="parentChildFields">
+                    <label for="parentSim">Parent</label>
+                    <select id="parentSim" class="sim-select">
+                        <option value="">Select parent...</option>
+                    </select>
+
+                    <label for="childSim">Child</label>
+                    <select id="childSim" class="sim-select">
+                        <option value="">Select child...</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="spouseFields" style="display: none;">
+                    <label for="spouse1">First Sim</label>
+                    <select id="spouse1" class="sim-select">
+                        <option value="">Select sim...</option>
+                    </select>
+
+                    <label for="spouse2">Second Sim</label>
+                    <select id="spouse2" class="sim-select">
+                        <option value="">Select sim...</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="siblingFields" style="display: none;">
+                    <label for="sibling1">First Sibling</label>
+                    <select id="sibling1" class="sim-select">
+                        <option value="">Select sibling...</option>
+                    </select>
+
+                    <label for="sibling2">Second Sibling</label>
+                    <select id="sibling2" class="sim-select">
+                        <option value="">Select sibling...</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelRelationshipBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Relationship</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/family-tree.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

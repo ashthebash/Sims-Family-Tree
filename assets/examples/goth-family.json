@@ -1,0 +1,130 @@
+{
+  "version": "1.0",
+  "sims": [
+    {
+      "id": "sim_1",
+      "name": "Bella Goth",
+      "gender": "female",
+      "age": "adult",
+      "traits": "Family-Oriented, Romantic, Creative",
+      "aspiration": "Successful Lineage",
+      "occupation": "Politician",
+      "x": 300,
+      "y": 100,
+      "notes": "Matriarch of the Goth family. Known for her mysterious disappearance and return."
+    },
+    {
+      "id": "sim_2",
+      "name": "Mortimer Goth",
+      "gender": "male",
+      "age": "adult",
+      "traits": "Bookworm, Genius, Family-Oriented",
+      "aspiration": "Renaissance Sim",
+      "occupation": "Scientist",
+      "x": 500,
+      "y": 100,
+      "notes": "Patriarch of the Goth family. A dedicated scientist and loving father."
+    },
+    {
+      "id": "sim_3",
+      "name": "Cassandra Goth",
+      "gender": "female",
+      "age": "young-adult",
+      "traits": "Creative, Perfectionist, Music Lover",
+      "aspiration": "Musical Genius",
+      "occupation": "Musician",
+      "x": 250,
+      "y": 300,
+      "notes": "Eldest daughter. Aspiring musician with a creative soul."
+    },
+    {
+      "id": "sim_4",
+      "name": "Alexander Goth",
+      "gender": "male",
+      "age": "child",
+      "traits": "Creative, Outgoing",
+      "aspiration": "Artistic Prodigy",
+      "occupation": "",
+      "x": 450,
+      "y": 300,
+      "notes": "Youngest son. Showing early signs of artistic talent."
+    },
+    {
+      "id": "sim_5",
+      "name": "Cornelia Goth",
+      "gender": "female",
+      "age": "elder",
+      "traits": "Proper, Snob, Art Lover",
+      "aspiration": "Fabulously Wealthy",
+      "occupation": "Retired",
+      "x": 550,
+      "y": -100,
+      "notes": "Mortimer's mother. Former socialite with refined tastes."
+    },
+    {
+      "id": "sim_6",
+      "name": "Gunther Goth",
+      "gender": "male",
+      "age": "elder",
+      "traits": "Ambitious, Hot-Headed",
+      "aspiration": "Mansion Baron",
+      "occupation": "Retired",
+      "x": 750,
+      "y": -100,
+      "notes": "Mortimer's father (deceased). Founded the Goth family fortune."
+    }
+  ],
+  "relationships": [
+    {
+      "from": "sim_1",
+      "to": "sim_2",
+      "type": "spouse"
+    },
+    {
+      "from": "sim_1",
+      "to": "sim_3",
+      "type": "parent"
+    },
+    {
+      "from": "sim_2",
+      "to": "sim_3",
+      "type": "parent"
+    },
+    {
+      "from": "sim_1",
+      "to": "sim_4",
+      "type": "parent"
+    },
+    {
+      "from": "sim_2",
+      "to": "sim_4",
+      "type": "parent"
+    },
+    {
+      "from": "sim_3",
+      "to": "sim_4",
+      "type": "sibling"
+    },
+    {
+      "from": "sim_5",
+      "to": "sim_2",
+      "type": "parent"
+    },
+    {
+      "from": "sim_6",
+      "to": "sim_2",
+      "type": "parent"
+    },
+    {
+      "from": "sim_5",
+      "to": "sim_6",
+      "type": "spouse"
+    }
+  ],
+  "metadata": {
+    "created": "2026-01-05",
+    "simCount": 6,
+    "title": "The Goth Family",
+    "description": "One of the most iconic families in The Sims franchise"
+  }
+}
